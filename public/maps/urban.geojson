@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "note": "Sample pre-projected (local metres) fixture demonstrating the GeoJSON building pipeline. Coordinates are [x, y] in metres; the parser maps x->world.x and y->-world.z. Replace with an OSM/Overture export for a real district.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "building": "yes", "levels": 6, "category": "commercial" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[40, 40], [64, 40], [64, 68], [40, 68], [40, 40]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "building": "yes", "levels": 3, "category": "residential" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-70, 30], [-46, 30], [-46, 52], [-70, 52], [-70, 30]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "building": "yes", "height": 8, "category": "industrial" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-40, -60], [-4, -60], [-4, -34], [-40, -34], [-40, -60]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "highway": "residential", "width": 12 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-80, 0], [80, 0]]
+      }
+    }
+  ]
+}

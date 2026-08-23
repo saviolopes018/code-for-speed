@@ -1,0 +1,256 @@
+:root {
+  --hud-fg: #f5f7fa;
+  --hud-accent: #ff7a1a;
+  --hud-nitro: #34c6ff;
+  --hud-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  --font: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05070c;
+  font-family: var(--font);
+  color: var(--hud-fg);
+  user-select: none;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#hud,
+#overlay,
+#debug-panel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ---------------- HUD ---------------- */
+.hud-top {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  text-shadow: var(--hud-shadow);
+}
+
+.hud-lap {
+  font-size: 18px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.hud-region {
+  font-size: 16px;
+  letter-spacing: 4px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.hud-attribution {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  opacity: 0.45;
+}
+
+.hud-time {
+  font-size: 42px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.hud-speed {
+  position: absolute;
+  right: 48px;
+  bottom: 48px;
+  text-align: right;
+  text-shadow: var(--hud-shadow);
+}
+
+.hud-speed .value {
+  font-size: 92px;
+  font-weight: 900;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-speed .unit {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  opacity: 0.75;
+}
+
+.hud-nitro {
+  position: absolute;
+  left: 48px;
+  bottom: 52px;
+  width: 260px;
+  text-shadow: var(--hud-shadow);
+}
+
+.hud-nitro .label {
+  font-size: 14px;
+  letter-spacing: 4px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+.hud-nitro .bar {
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.hud-nitro .fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #1e88ff, var(--hud-nitro));
+  transition: width 0.08s linear;
+}
+
+.hud-nitro.active .fill {
+  background: linear-gradient(90deg, #ff7a1a, #ffd24a);
+  box-shadow: 0 0 16px var(--hud-accent);
+}
+
+.hud-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  letter-spacing: 1px;
+  opacity: 0.55;
+}
+
+/* ---------------- Overlay (countdown / results) ---------------- */
+.overlay-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-shadow: var(--hud-shadow);
+}
+
+.countdown {
+  font-size: 180px;
+  font-weight: 900;
+  color: var(--hud-accent);
+  animation: pop 0.5s ease-out;
+}
+
+.countdown.go {
+  color: #7cff5a;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(1.8);
+    opacity: 0.2;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.results {
+  background: rgba(5, 8, 14, 0.82);
+  padding: 40px 64px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  pointer-events: auto;
+}
+
+.results h1 {
+  font-size: 34px;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+
+.results .final-time {
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--hud-accent);
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 20px;
+}
+
+.results .sub {
+  opacity: 0.7;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+.title-screen {
+  gap: 10px;
+}
+
+.title-screen .brand {
+  font-size: 72px;
+  font-weight: 900;
+  letter-spacing: 8px;
+}
+
+.title-screen .tagline {
+  font-size: 18px;
+  letter-spacing: 3px;
+  opacity: 0.75;
+  margin-bottom: 24px;
+}
+
+.title-screen .start {
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--hud-accent);
+  animation: blink 1.2s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------------- Debug panel ---------------- */
+#debug-panel {
+  padding: 10px 12px;
+  inset: auto auto 0 0;
+  width: 260px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.6);
+  color: #9dffb0;
+  white-space: pre;
+}

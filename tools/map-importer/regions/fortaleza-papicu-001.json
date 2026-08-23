@@ -1,0 +1,15 @@
+{
+  "id": "fortaleza-papicu-001",
+  "name": "Fortaleza — Papicu",
+  "origin": {
+    "lat": -3.7398314,
+    "lon": -38.4871768
+  },
+  "bbox": {
+    "south": -3.7488145,
+    "west": -38.4961791,
+    "north": -3.7308483,
+    "east": -38.4781745
+  },
+  "notes": "Initial ~2km x 2km development region around Papicu, Fortaleza. bbox derived from origin +/- 1000m. Edit here to move/resize the region; the importer reads this file and never hardcodes bounds."
+}
