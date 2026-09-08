@@ -67,8 +67,8 @@ export interface VariantMaterialParams {
 
 /** Per-variant material multipliers over the single shared asphalt texture set. */
 export const VARIANT_MATERIAL: Record<AsphaltVariant, VariantMaterialParams> = {
-  clean: { color: 0xffffff, roughness: 0.9, normalScale: 0.55 },
-  used: { color: 0xdfe1e4, roughness: 0.95, normalScale: 0.8 },
-  worn: { color: 0xb9bcc2, roughness: 0.99, normalScale: 1.05 },
-  patched: { color: 0xc9c6c2, roughness: 0.97, normalScale: 0.95 },
+  clean: { color: 0xe9e9e8, roughness: 0.96, normalScale: 0.3 },
+  used: { color: 0xefefed, roughness: 0.98, normalScale: 0.4 },
+  worn: { color: 0xf4f3f1, roughness: 1, normalScale: 0.5 },
+  patched: { color: 0xecebe9, roughness: 0.99, normalScale: 0.45 },
 };

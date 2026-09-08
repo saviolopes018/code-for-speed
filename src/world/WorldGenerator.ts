@@ -5,6 +5,7 @@ import { setupLighting } from '../rendering/Lighting';
 import { createGround } from './Ground';
 import { generateRoads, type RoadRenderStats } from './RoadGenerator';
 import { generateBuildings, type BuildingStats } from './BuildingMassing';
+import { generateBuildingColliders } from './BuildingColliders';
 import { NormalizedMapLoader } from './geo/NormalizedMapLoader';
 import { computeMapBounds, computeOverviewHeight, type MapBounds } from './geo/MapBounds';
 import type { MapMetadata, NormalizedMapData, NormalizedRoad } from './geo/GeoTypes';
@@ -17,6 +18,7 @@ export interface SpawnPose {
 export interface WorldStats extends RoadRenderStats {
   bounds: MapBounds;
   buildings: BuildingStats;
+  buildingColliders: number;
 }
 
 export interface OverviewFraming {
@@ -31,8 +33,8 @@ export interface OverviewFraming {
  *
  *   MapLoader -> NormalizedMapData -> ground + RoadGenerator -> Three.js scene
  *
- * The flat ground provides driving collision (roads are visual for World v0), so
- * the existing vehicle physics is untouched. Spawn/reset snap to the nearest
+ * Flat ground supports driving; static building prisms block the vehicle while
+ * preserving footprint setbacks. Roads remain visual. Spawn/reset snap to the nearest
  * real road. Also owns a coexisting "map validation" debug mode (bright bg,
  * high-contrast class-coloured roads, bounds + origin + vehicle markers).
  */
@@ -90,7 +92,8 @@ export class WorldGenerator {
     this.buildDebugHelpers();
     scene.add(this.debugHelpers);
 
-    this.stats = { ...network.stats, bounds: this.bounds, buildings: massing.stats };
+    const buildingColliders = generateBuildingColliders(physics, map.buildings ?? []);
+    this.stats = { ...network.stats, bounds: this.bounds, buildings: massing.stats, buildingColliders };
   }
 
   /** Bounds rectangle, world origin axes/pillar and a vehicle locator. */

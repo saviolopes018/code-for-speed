@@ -39,7 +39,7 @@ export class Vehicle {
   }
 
   /** Per-frame visual sync (runs at render rate). */
-  syncVisual(elapsed: number): void {
+  syncVisual(elapsed: number, frameDelta = 0): void {
     const p = this.physics.position;
     const r = this.physics.rotation;
     this._pos.set(p.x, p.y, p.z);
@@ -49,7 +49,7 @@ export class Vehicle {
     const t = this.telemetry;
     this.visual.setBraking(t.brake > 0 && t.speed > 0.5);
     this.visual.setNitro(t.nitroActive, elapsed);
-    this.visual.spinWheels(t.speed, 1 / 60);
+    this.visual.spinWheels(t.speed, frameDelta);
   }
 
   get telemetry(): VehicleTelemetry {

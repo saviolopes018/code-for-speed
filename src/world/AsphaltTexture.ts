@@ -19,7 +19,7 @@ const SIZE = 1024;
 /** Base asphalt binder colour. Deliberately a mid-dark neutral grey (a *clean*
  * road) so per-variant material tints can darken it multiplicatively for wear —
  * a MeshStandardMaterial `color` can only darken the albedo, never brighten it. */
-const BASE = { r: 0x3e, g: 0x41, b: 0x47 };
+const BASE = { r: 0x55, g: 0x56, b: 0x57 };
 
 export interface AsphaltMaps {
   map: THREE.CanvasTexture;
@@ -102,20 +102,20 @@ function fbm(rng: () => number, octaves: Array<[number, number]>): Float32Array 
 function buildHeight(rng: () => number): Float32Array {
   // Multi-octave grain gives the fine-grained binder texture.
   const h = fbm(rng, [
-    [8, 0.5],
-    [32, 0.28],
-    [128, 0.16],
-    [512, 0.1],
+    [8, 0.06],
+    [32, 0.12],
+    [128, 0.32],
+    [512, 0.5],
   ]);
 
   // Aggregate stones: circular bumps of varied radius scattered densely, drawn
   // with wrap so edges stay seamless. Raised above the binder.
-  const stoneCount = 2600;
+  const stoneCount = 18000;
   for (let i = 0; i < stoneCount; i++) {
     const cx = rng() * SIZE;
     const cy = rng() * SIZE;
-    const r = 3 + rng() * 9;
-    const peak = 0.25 + rng() * 0.55;
+    const r = 0.6 + rng() * 1.8;
+    const peak = 0.08 + rng() * 0.2;
     const r2 = r * r;
     const x0 = Math.floor(cx - r);
     const x1 = Math.ceil(cx + r);
@@ -137,7 +137,7 @@ function buildHeight(rng: () => number): Float32Array {
   }
 
   // Cracks: thin recessed grooves (jittered polylines), wrapped.
-  const crackCount = 14;
+  const crackCount = 3;
   for (let i = 0; i < crackCount; i++) {
     let x = rng() * SIZE;
     let y = rng() * SIZE;
@@ -147,7 +147,7 @@ function buildHeight(rng: () => number): Float32Array {
       ang += (rng() - 0.5) * 0.7;
       x += Math.cos(ang) * 3;
       y += Math.sin(ang) * 3;
-      const gr = 1.2 + rng() * 1.3; // groove radius
+      const gr = 0.4 + rng() * 0.5; // groove radius
       const gr2 = gr * gr;
       const gx0 = Math.floor(x - gr);
       const gx1 = Math.ceil(x + gr);
@@ -224,7 +224,7 @@ export function getAsphaltMaps(anisotropy = 1): AsphaltMaps {
   const N = normalImg.data;
   const R = roughImg.data;
 
-  const NORMAL_STRENGTH = 1.9;
+  const NORMAL_STRENGTH = 0.65;
 
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
@@ -236,12 +236,12 @@ export function getAsphaltMaps(anisotropy = 1): AsphaltMaps {
       // Aggregate tops read lighter; grooves darker. Patchiness tints regions;
       // stains darken sparsely.
       const aggregate = Math.max(0, hv - 0.55) * 1.6; // 0..~0.7
-      const patchTone = (patch[j] - 0.5) * 24; // ±12 regional lightness
-      const stainDark = Math.max(0, stain[j] - 0.62) * 90; // darkening blotches
-      const grain = (hv - 0.5) * 24;
-      const light = grain + aggregate * 42 + patchTone - stainDark;
+      const patchTone = (patch[j] - 0.5) * 6; // subtle regional lightness
+      const stainDark = Math.max(0, stain[j] - 0.62) * 32; // darkening blotches
+      const grain = (hv - 0.5) * 10;
+      const light = grain + aggregate * 6 + patchTone - stainDark;
       // Aggregate stones pick up a faint warm/neutral cast vs. the cool binder.
-      const warm = aggregate * 10;
+      const warm = aggregate * 2;
       A[o] = clamp255(BASE.r + light + warm);
       A[o + 1] = clamp255(BASE.g + light + warm * 0.6);
       A[o + 2] = clamp255(BASE.b + light);

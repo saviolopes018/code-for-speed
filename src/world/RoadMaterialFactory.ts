@@ -31,6 +31,7 @@ export function createAsphaltMaterials(
       color: p.color,
       roughness: p.roughness,
       metalness: 0.0,
+      envMapIntensity: 0.2,
       vertexColors: true,
     });
   }

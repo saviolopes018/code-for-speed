@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createEnvironmentReflection } from './EnvironmentReflection';
 
 /** Owns the WebGL renderer, scene and camera, plus resize handling. */
 export class Renderer {
@@ -17,6 +18,8 @@ export class Renderer {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
+    this.scene.environment = createEnvironmentReflection(this.renderer).texture;
+    this.scene.environmentIntensity = 0.4;
 
     // Far plane must clear the sky dome + let distant city fade into fog.
     this.camera = new THREE.PerspectiveCamera(70, 1, 0.1, 6000);
