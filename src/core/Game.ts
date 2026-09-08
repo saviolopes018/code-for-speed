@@ -171,7 +171,7 @@ export class Game {
       }
     }
 
-    this.vehicle.syncVisual(this.time.elapsed);
+    this.vehicle.syncVisual(this.time.elapsed, this.state === 'playing' ? this.time.frameDelta : 0);
     this.camera.update(this.time.frameDelta, this.time.elapsed);
 
     if (this.state === 'playing') {
@@ -236,6 +236,7 @@ export class Game {
       roadCount: () => this.world.stats.roads,
       roadTriangles: () => this.world.stats.triangles,
       buildingCount: () => this.world.stats.buildings.buildings,
+      buildingColliderCount: () => this.world.stats.buildingColliders,
       buildingTriangles: () => this.world.stats.buildings.triangles,
       drawCalls: () => this.renderer.info.render.calls,
       worldLoadMs: () => this.worldLoadMs,

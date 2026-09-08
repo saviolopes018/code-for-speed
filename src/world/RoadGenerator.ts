@@ -41,7 +41,7 @@ const ROAD_Y = 0.06; // sit just above the ground plane to avoid z-fighting
 /** World-space size of one asphalt texture tile, in metres. UVs are authored in
  * metres and the texture repeat is 1/TILE_METERS, so texel density is uniform
  * regardless of road width. */
-const TILE_METERS = 8;
+const TILE_METERS = 3;
 
 /** Number of shared asphalt textures (albedo, normal, roughness). */
 const ASPHALT_TEXTURE_COUNT = 3;

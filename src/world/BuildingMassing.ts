@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { BuildingFamily, NormalizedBuilding } from './geo/GeoTypes';
-import { FAMILY_COLOR } from './geo/BuildingStyle';
+import { FAMILY_COLOR, hash01, FLOOR_HEIGHT } from './geo/BuildingStyle';
+import { createFacadeTexture } from './BuildingFacade';
 
 export interface BuildingStats {
   buildings: number;
@@ -24,8 +25,8 @@ export interface BuildingMassing {
  *   NormalizedBuilding -> THREE.Shape -> ExtrudeGeometry -> merged Mesh (per family)
  *
  * Geometry is merged per material family so a whole district is a handful of
- * draw calls, not thousands. No interiors/roofs/details — just footprint+height,
- * which is enough to read the city. No colliders (World v1.0, Option A).
+ * draw calls, not thousands. Facade textures repeat in metric-sized bays; roofs
+ * remain solid. Collision generation is owned by BuildingColliders.
  */
 export function generateBuildings(buildings: NormalizedBuilding[]): BuildingMassing {
   const byFamilyGeo = new Map<BuildingFamily, THREE.BufferGeometry[]>();
@@ -41,6 +42,7 @@ export function generateBuildings(buildings: NormalizedBuilding[]): BuildingMass
   for (const b of buildings) {
     const geo = extrudeFootprint(b.footprint, b.height);
     if (!geo) continue;
+    decorateBuilding(geo, b);
 
     const list = byFamilyGeo.get(b.family) ?? [];
     list.push(geo);
@@ -59,16 +61,17 @@ export function generateBuildings(buildings: NormalizedBuilding[]): BuildingMass
     if (!merged) continue;
 
     const material = new THREE.MeshStandardMaterial({
-      color: FAMILY_COLOR[family],
+      map: createFacadeTexture(family),
+      vertexColors: true,
       roughness: 0.92,
       metalness: 0.0,
       flatShading: true, // cheap, and reads massing clearly in daylight
     });
     const mesh = new THREE.Mesh(merged, material);
     mesh.name = `buildings-${family}`;
-    // Shadows disabled on buildings for perf (World v1.0). Sun still shades faces.
+    // Avoid rendering the entire city into the shadow map.
     mesh.castShadow = false;
-    mesh.receiveShadow = false;
+    mesh.receiveShadow = true;
 
     const pos = merged.getAttribute('position');
     stats.vertices += pos ? pos.count : 0;
@@ -105,4 +108,33 @@ function extrudeFootprint(
   });
   geo.rotateX(-Math.PI / 2); // shape XY plane -> world XZ, depth -> +Y
   return geo;
+}
+
+/** Fit complete window bays to each wall and complete floors to the height. */
+function decorateBuilding(geo: THREE.BufferGeometry, building: NormalizedBuilding): void {
+  const positions = geo.getAttribute('position');
+  const normals = geo.getAttribute('normal');
+  const uv = geo.getAttribute('uv');
+  const colors = new Float32Array(positions.count * 3);
+  const tint = new THREE.Color(FAMILY_COLOR[building.family]);
+  tint.offsetHSL((hash01(building.id) - 0.5) * 0.08, 0.02, (hash01(building.id + 'tone') - 0.5) * 0.16);
+  const floors = Math.max(1, Math.round(building.height / FLOOR_HEIGHT));
+  for (let i = 0; i < positions.count; i += 3) {
+    const roof = Math.abs(normals.getY(i)) > 0.5;
+    const nx = normals.getX(i), nz = normals.getZ(i);
+    const along = [0, 1, 2].map(j => positions.getX(i + j) * nz - positions.getZ(i + j) * nx);
+    const min = Math.min(...along), length = Math.max(...along) - min;
+    const bays = Math.max(1, Math.round(length / (building.family === 'industrial' ? 5 : 3.2)));
+    for (let j = 0; j < 3; j++) {
+      const v = i + j;
+      // Roof samples a solid plaster texel, never the windows.
+      uv.setXY(v, roof ? 0.03 : (along[j] - min) / Math.max(length, 0.001) * bays,
+        roof ? 0.5 : positions.getY(v) / building.height * floors);
+      const shade = roof ? 0.66 : 1;
+      colors[v * 3] = tint.r * shade;
+      colors[v * 3 + 1] = tint.g * shade;
+      colors[v * 3 + 2] = tint.b * shade;
+    }
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 }

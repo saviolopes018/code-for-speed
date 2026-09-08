@@ -27,6 +27,10 @@ test.describe('CODE FOR SPEED — Fortaleza free roam smoke', () => {
     const tris = await page.evaluate(() => (window as any).__CFS__.roadTriangles());
     expect(tris).toBeGreaterThan(0);
 
+    const buildings = await page.evaluate(() => (window as any).__CFS__.buildingCount());
+    expect(buildings).toBeGreaterThan(100);
+    expect(await page.evaluate(() => (window as any).__CFS__.buildingColliderCount())).toBe(buildings);
+
     // 5. start free roam from the title screen
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => (window as any).__CFS__.getState() === 'playing', {
